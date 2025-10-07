@@ -40,10 +40,12 @@ class BoardController extends AbstractController
         $joinUrl = $this->urlGenerator->generate('join', ['code' => $code], UrlGeneratorInterface::ABSOLUTE_URL);
         $qrCode = $this->qrCodeService->generateQRCode($joinUrl);
 
-        $players = $this->tombolaManager->getPlayers($code);
+        $state = $this->tombolaManager->getState($code);
+        $players = ($state === 'in_round' || $state === 'showing_winner') 
+            ? $this->tombolaManager->getActivePlayers($code)
+            : $this->tombolaManager->getPlayers($code);
         $winners = $this->tombolaManager->getWinners($code);
         $round = $this->tombolaManager->getRound($code);
-        $state = $this->tombolaManager->getState($code);
 
         // Generate JWT token for Mercure subscription
         $jwtSecret = $_ENV['MERCURE_JWT_SECRET'] ?? '!ChangeThisMercureHubJWTSecretKey!';
@@ -71,6 +73,21 @@ class BoardController extends AbstractController
         ]);
     }
 
+    #[Route('/board/{code}/enter-fullscreen', name: 'board_enter_fullscreen', methods: ['POST'])]
+    public function enterFullscreen(string $code): JsonResponse
+    {
+        if (!$this->tombolaManager->tombolaExists($code)) {
+            return new JsonResponse(['error' => 'Tombola not found'], 404);
+        }
+
+        $this->tombolaManager->setState($code, 'in_round');
+        $this->tombolaManager->freezePlayers($code);
+
+        return new JsonResponse([
+            'success' => true,
+        ]);
+    }
+
     #[Route('/board/{code}/start-round', name: 'board_start_round', methods: ['POST'])]
     public function startRound(string $code): JsonResponse
     {
@@ -78,7 +95,7 @@ class BoardController extends AbstractController
             return new JsonResponse(['error' => 'Tombola not found'], 404);
         }
 
-        $players = $this->tombolaManager->getPlayers($code);
+        $players = $this->tombolaManager->getActivePlayers($code);
         
         if (count($players) < 1) {
             return new JsonResponse(['error' => 'Need at least 1 player'], 400);

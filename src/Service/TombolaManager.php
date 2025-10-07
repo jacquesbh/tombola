@@ -72,9 +72,33 @@ class TombolaManager
         return json_decode($data, true);
     }
 
-    public function selectWinner(string $code): ?array
+    public function freezePlayers(string $code): void
     {
         $players = $this->getPlayers($code);
+        
+        $this->tombolaCache->delete("tombola.{$code}.active_players");
+        $this->tombolaCache->get("tombola.{$code}.active_players", function (ItemInterface $item) use ($players) {
+            $item->expiresAfter(86400);
+            return json_encode($players);
+        });
+    }
+
+    public function getActivePlayers(string $code): array
+    {
+        $data = $this->tombolaCache->get("tombola.{$code}.active_players", function (ItemInterface $item) use ($code) {
+            $item->expiresAfter(86400);
+            return $this->tombolaCache->get("tombola.{$code}.players", function (ItemInterface $item) {
+                $item->expiresAfter(86400);
+                return json_encode([]);
+            });
+        });
+
+        return json_decode($data, true);
+    }
+
+    public function selectWinner(string $code): ?array
+    {
+        $players = $this->getActivePlayers($code);
         
         if (empty($players)) {
             return null;

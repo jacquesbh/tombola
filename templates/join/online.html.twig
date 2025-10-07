@@ -9,9 +9,9 @@
             <div class="inline-block relative">
                 <img src="{{ player.gravatarUrl }}" 
                      alt="{{ player.firstName }}" 
-                     class="w-32 h-32 rounded-full border-8 border-green-500 shadow-2xl mx-auto">
-                <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center animate-pulse">
-                    <span class="text-2xl">✓</span>
+                     class="w-32 h-32 rounded-full border-8 {{ isPending ? 'border-orange-500' : 'border-green-500' }} shadow-2xl mx-auto">
+                <div class="absolute -top-2 -right-2 {{ isPending ? 'bg-orange-500' : 'bg-green-500' }} text-white rounded-full w-12 h-12 flex items-center justify-center animate-pulse">
+                    <span class="text-2xl">{{ isPending ? '⏳' : '✓' }}</span>
                 </div>
             </div>
         </div>
@@ -20,6 +20,19 @@
             {{ player.firstName }} {{ player.lastName }}
         </h1>
         
+        {% if isPending %}
+        <div class="inline-flex items-center gap-2 bg-orange-100 text-orange-800 px-6 py-3 rounded-full font-bold text-lg mb-8">
+            <span class="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></span>
+            EN ATTENTE
+        </div>
+
+        <div class="bg-gradient-to-r from-orange-100 to-yellow-100 rounded-2xl p-6">
+            <p class="text-gray-700 text-lg">
+                Vous êtes en attente pour le prochain tour.<br>
+                <span class="font-semibold">Restez connecté ! ⏳</span>
+            </p>
+        </div>
+        {% else %}
         <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full font-bold text-lg mb-8">
             <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
             ONLINE
@@ -31,10 +44,38 @@
                 <span class="font-semibold">Bonne chance ! 🍀</span>
             </p>
         </div>
+        {% endif %}
 
         <p class="text-gray-500 text-sm mt-8">
             Gardez cette page ouverte pendant la tombola
         </p>
     </div>
 </div>
+
+<script>
+const code = '{{ code }}';
+const mercureUrl = '{{ mercure_public_url }}';
+const mercureToken = '{{ mercure_token }}';
+
+const mercureTopicUrl = `${mercureUrl}?topic=${encodeURIComponent(`tombola/${code}/players`)}&authorization=${encodeURIComponent(mercureToken)}`;
+console.log('Connecting to Mercure:', mercureTopicUrl);
+const eventSource = new EventSource(mercureTopicUrl);
+
+eventSource.onopen = () => {
+    console.log('✅ Mercure connection opened for player');
+};
+
+eventSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log('📨 Mercure event received:', data);
+
+    if (data.type === 'round_ready') {
+        location.reload();
+    }
+};
+
+eventSource.onerror = (error) => {
+    console.error('❌ EventSource error:', error);
+};
+</script>
 {% endblock %}

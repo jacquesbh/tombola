@@ -205,8 +205,25 @@ function adjustCardSize(totalCards) {
 }
 
 if (fullscreenBtn) {
-    fullscreenBtn.addEventListener('click', () => {
-        enterFullscreen();
+    fullscreenBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch(`/board/${code}/enter-fullscreen`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                enterFullscreen();
+            } else {
+                const error = await response.json();
+                alert(error.error || 'Erreur lors du passage en plein écran');
+            }
+        } catch (error) {
+            console.error('Error entering fullscreen:', error);
+            alert('Erreur lors du passage en plein écran');
+        }
     });
 }
 

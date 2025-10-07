@@ -46,5 +46,10 @@ class MercurePublisher
             'type' => 'next_round_ready',
             'round' => $round,
         ]);
+        
+        $this->publish("tombola/{$code}/players", [
+            'type' => 'round_ready',
+            'round' => $round,
+        ]);
     }
 }

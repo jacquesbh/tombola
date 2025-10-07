@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Service\MercurePublisher;
 use App\Service\TombolaManager;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
+use Lcobucci\JWT\Signer\Key\InMemory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,8 +77,10 @@ class JoinController extends AbstractController
         }
 
         $players = $this->tombolaManager->getPlayers($code);
-        $player = null;
+        $activePlayers = $this->tombolaManager->getActivePlayers($code);
+        $state = $this->tombolaManager->getState($code);
         
+        $player = null;
         foreach ($players as $p) {
             if ($p['id'] === $playerId) {
                 $player = $p;
@@ -87,9 +92,33 @@ class JoinController extends AbstractController
             throw $this->createNotFoundException('Player not found');
         }
 
+        $isActive = false;
+        foreach ($activePlayers as $p) {
+            if ($p['id'] === $playerId) {
+                $isActive = true;
+                break;
+            }
+        }
+
+        $isPending = !$isActive && ($state === 'in_round' || $state === 'showing_winner');
+
+        $jwtSecret = $_ENV['MERCURE_JWT_SECRET'] ?? '!ChangeThisMercureHubJWTSecretKey!';
+        $config = Configuration::forSymmetricSigner(
+            new Sha256(),
+            InMemory::plainText($jwtSecret)
+        );
+        
+        $token = $config->builder()
+            ->withClaim('mercure', ['subscribe' => ["tombola/{$code}/players"]])
+            ->getToken($config->signer(), $config->signingKey())
+            ->toString();
+
         return $this->render('join/online.html.twig', [
             'code' => $code,
             'player' => $player,
+            'isPending' => $isPending,
+            'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'http://localhost:3000/.well-known/mercure',
+            'mercure_token' => $token,
         ]);
     }
 }
