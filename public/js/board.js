@@ -80,7 +80,7 @@ function handleRoundStarted(winnerId) {
             card.classList.add('animate-fade-out');
             setTimeout(() => {
                 if (card) {
-                    card.style.display = 'none';
+                    card.style.visibility = 'hidden';
                 }
             }, 300);
         }
@@ -90,16 +90,46 @@ function handleRoundStarted(winnerId) {
 }
 
 function showWinner(winnerId) {
+    const playersGrid = document.getElementById('players-grid');
     const winnerCard = document.querySelector(`[data-player-id="${winnerId}"]`);
+    
     if (winnerCard) {
-        winnerCard.classList.add('animate-winner', 'col-span-5');
-        winnerCard.style.transform = 'scale(1.5)';
-        winnerCard.style.margin = 'auto';
+        playersGrid.innerHTML = '';
+        playersGrid.style.gridTemplateColumns = '1fr';
+        playersGrid.classList.add('winner-display');
+        playersGrid.appendChild(winnerCard);
+        
+        winnerCard.classList.add('animate-winner');
+        winnerCard.style.transform = 'scale(2.5)';
+        
+        createConfetti();
     }
 
     setTimeout(() => {
         nextRoundBtn.classList.remove('hidden');
+        nextRoundBtn.classList.add('next-round-corner');
     }, 5000);
+}
+
+function createConfetti() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
+    const confettiCount = 150;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confetti.style.animationDelay = '0s';
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
+        }, i * 30);
+    }
 }
 
 function handleNextRoundReady(round) {
@@ -120,9 +150,14 @@ function enterFullscreen() {
     const qrSection = document.getElementById('qr-section');
     const boardHeader = document.getElementById('board-header');
     const playersGrid = document.getElementById('players-grid');
+    const previousWinners = document.getElementById('previous-winners');
     
     qrSection.style.display = 'none';
     boardHeader.style.display = 'none';
+    startRoundBtn.style.display = 'none';
+    if (previousWinners) {
+        previousWinners.style.display = 'none';
+    }
     
     mainBoard.classList.remove('col-span-9');
     mainBoard.classList.add('col-span-12');
@@ -130,8 +165,33 @@ function enterFullscreen() {
     boardContainer.classList.add('fullscreen-mode');
     
     const totalCards = document.querySelectorAll('.player-card').length;
-    const columns = Math.ceil(Math.sqrt(totalCards * 1.5));
+    const columns = Math.ceil(Math.sqrt(totalCards * 1.6));
     playersGrid.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
+    playersGrid.classList.add('fullscreen-grid');
+    
+    adjustCardSize(totalCards);
+}
+
+function adjustCardSize(totalCards) {
+    const root = document.documentElement;
+    let avatarSize, fontSize;
+    
+    if (totalCards <= 20) {
+        avatarSize = '80px';
+        fontSize = '0.875rem';
+    } else if (totalCards <= 40) {
+        avatarSize = '60px';
+        fontSize = '0.75rem';
+    } else if (totalCards <= 60) {
+        avatarSize = '50px';
+        fontSize = '0.7rem';
+    } else {
+        avatarSize = '40px';
+        fontSize = '0.65rem';
+    }
+    
+    root.style.setProperty('--avatar-size', avatarSize);
+    root.style.setProperty('--card-font-size', fontSize);
 }
 
 if (startRoundBtn) {
