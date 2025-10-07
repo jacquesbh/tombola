@@ -22,6 +22,9 @@ eventSource.onmessage = (event) => {
         case 'player_joined':
             handlePlayerJoined(data.player, data.totalPlayers);
             break;
+        case 'player_left':
+            handlePlayerLeft(data.playerId, data.totalPlayers);
+            break;
         case 'round_started':
             handleRoundStarted(data.winnerId);
             break;
@@ -38,6 +41,19 @@ eventSource.onerror = (error) => {
         console.log('Connection closed, attempting to reconnect...');
     }
 };
+
+setInterval(async () => {
+    try {
+        await fetch(`/board/${code}/check-inactive`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+    } catch (error) {
+        console.error('Error checking inactive players:', error);
+    }
+}, 3000);
 
 function handlePlayerJoined(player, totalPlayers) {
     playerCount.textContent = totalPlayers;
@@ -58,6 +74,27 @@ function handlePlayerJoined(player, totalPlayers) {
             <p class="text-sm font-semibold text-gray-800">${player.lastName}</p>
         `;
         playersGrid.prepend(playerCard);
+    }
+}
+
+function handlePlayerLeft(playerId, totalPlayers) {
+    console.log('👋 Player left:', playerId, 'Total players:', totalPlayers);
+    playerCount.textContent = totalPlayers;
+
+    if (isInRound) {
+        console.log('⚠️ In round, not removing card from UI');
+        return;
+    }
+
+    const playerCard = document.querySelector(`[data-player-id="${playerId}"]`);
+    if (playerCard) {
+        console.log('✅ Removing player card from UI');
+        playerCard.classList.add('animate-fade-out');
+        setTimeout(() => {
+            playerCard.remove();
+        }, 300);
+    } else {
+        console.log('⚠️ Player card not found in DOM');
     }
 }
 

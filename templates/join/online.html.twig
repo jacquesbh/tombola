@@ -60,6 +60,13 @@ const mercureToken = '{{ mercure_token }}';
 
 let audioContext = null;
 
+setInterval(() => {
+    fetch(`/join/${code}/heartbeat/${playerId}`, {
+        method: 'POST',
+        keepalive: true
+    }).catch(err => console.error('Heartbeat failed:', err));
+}, 3000);
+
 document.addEventListener('click', () => {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();

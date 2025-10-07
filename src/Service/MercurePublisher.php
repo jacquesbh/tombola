@@ -31,6 +31,15 @@ class MercurePublisher
         ]);
     }
 
+    public function publishPlayerLeft(string $code, string $playerId, int $totalPlayers): void
+    {
+        $this->publish("tombola/{$code}/board", [
+            'type' => 'player_left',
+            'playerId' => $playerId,
+            'totalPlayers' => $totalPlayers,
+        ]);
+    }
+
     public function publishRoundStarted(string $code, string $winnerId, int $round): void
     {
         $this->publish("tombola/{$code}/board", [

@@ -48,6 +48,7 @@ class TombolaManager
             'email' => $email,
             'gravatarUrl' => $this->gravatarService->getGravatarUrl($email),
             'joinedAt' => time(),
+            'lastHeartbeat' => time(),
         ];
 
         $players = $this->getPlayers($code);
@@ -70,6 +71,71 @@ class TombolaManager
         });
 
         return json_decode($data, true);
+    }
+
+    public function updatePlayerHeartbeat(string $code, string $playerId): bool
+    {
+        $players = $this->getPlayers($code);
+        $updated = false;
+        
+        foreach ($players as &$player) {
+            if ($player['id'] === $playerId) {
+                $player['lastHeartbeat'] = time();
+                $updated = true;
+                break;
+            }
+        }
+        
+        if (!$updated) {
+            return false;
+        }
+        
+        $this->tombolaCache->delete("tombola.{$code}.players");
+        $this->tombolaCache->get("tombola.{$code}.players", function (ItemInterface $item) use ($players) {
+            $item->expiresAfter(86400);
+            return json_encode($players);
+        });
+        
+        return true;
+    }
+
+    public function removeInactivePlayers(string $code, int $timeoutSeconds = 15): array
+    {
+        $players = $this->getPlayers($code);
+        $currentTime = time();
+        $removedPlayers = [];
+        
+        $activePlayers = array_filter($players, function($player) use ($currentTime, $timeoutSeconds, &$removedPlayers) {
+            $isActive = ($currentTime - ($player['lastHeartbeat'] ?? 0)) <= $timeoutSeconds;
+            if (!$isActive) {
+                $removedPlayers[] = $player['id'];
+            }
+            return $isActive;
+        });
+        
+        $activePlayers = array_values($activePlayers);
+        
+        if (count($removedPlayers) > 0) {
+            $this->tombolaCache->delete("tombola.{$code}.players");
+            $this->tombolaCache->get("tombola.{$code}.players", function (ItemInterface $item) use ($activePlayers) {
+                $item->expiresAfter(86400);
+                return json_encode($activePlayers);
+            });
+            
+            $frozenPlayers = $this->getActivePlayers($code);
+            $frozenPlayers = array_filter($frozenPlayers, function($player) use ($removedPlayers) {
+                return !in_array($player['id'], $removedPlayers);
+            });
+            $frozenPlayers = array_values($frozenPlayers);
+            
+            $this->tombolaCache->delete("tombola.{$code}.active_players");
+            $this->tombolaCache->get("tombola.{$code}.active_players", function (ItemInterface $item) use ($frozenPlayers) {
+                $item->expiresAfter(86400);
+                return json_encode($frozenPlayers);
+            });
+        }
+        
+        return $removedPlayers;
     }
 
     public function freezePlayers(string $code): void

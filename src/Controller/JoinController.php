@@ -121,4 +121,34 @@ class JoinController extends AbstractController
             'mercure_token' => $token,
         ]);
     }
+
+    #[Route('/join/{code}/heartbeat/{playerId}', name: 'join_heartbeat', methods: ['POST'])]
+    public function heartbeat(string $code, string $playerId): Response
+    {
+        if (!$this->tombolaManager->tombolaExists($code)) {
+            return new Response('', 404);
+        }
+
+        $updated = $this->tombolaManager->updatePlayerHeartbeat($code, $playerId);
+        
+        if (!$updated) {
+            return new Response('', 404);
+        }
+
+        $removedPlayerIds = $this->tombolaManager->removeInactivePlayers($code, 6);
+        
+        if (count($removedPlayerIds) > 0) {
+            $totalPlayers = count($this->tombolaManager->getPlayers($code));
+            
+            foreach ($removedPlayerIds as $removedPlayerId) {
+                try {
+                    $this->mercurePublisher->publishPlayerLeft($code, $removedPlayerId, $totalPlayers);
+                } catch (\Exception $e) {
+                    // Log error but continue
+                }
+            }
+        }
+
+        return new Response('', 204);
+    }
 }

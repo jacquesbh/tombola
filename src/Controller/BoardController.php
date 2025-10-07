@@ -40,6 +40,16 @@ class BoardController extends AbstractController
         $joinUrl = $this->urlGenerator->generate('join', ['code' => $code], UrlGeneratorInterface::ABSOLUTE_URL);
         $qrCode = $this->qrCodeService->generateQRCode($joinUrl);
 
+        $removedPlayerIds = $this->tombolaManager->removeInactivePlayers($code, 6);
+        $totalPlayers = count($this->tombolaManager->getPlayers($code));
+        
+        foreach ($removedPlayerIds as $removedPlayerId) {
+            try {
+                $this->mercurePublisher->publishPlayerLeft($code, $removedPlayerId, $totalPlayers);
+            } catch (\Exception $e) {
+            }
+        }
+        
         $state = $this->tombolaManager->getState($code);
         $players = ($state === 'in_round' || $state === 'showing_winner') 
             ? $this->tombolaManager->getActivePlayers($code)
@@ -71,6 +81,26 @@ class BoardController extends AbstractController
             'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'http://localhost:3000/.well-known/mercure',
             'mercure_token' => $token,
         ]);
+    }
+
+    #[Route('/board/{code}/check-inactive', name: 'board_check_inactive', methods: ['POST'])]
+    public function checkInactive(string $code): JsonResponse
+    {
+        if (!$this->tombolaManager->tombolaExists($code)) {
+            return new JsonResponse(['error' => 'Tombola not found'], 404);
+        }
+
+        $removedPlayerIds = $this->tombolaManager->removeInactivePlayers($code, 6);
+        $totalPlayers = count($this->tombolaManager->getPlayers($code));
+        
+        foreach ($removedPlayerIds as $removedPlayerId) {
+            try {
+                $this->mercurePublisher->publishPlayerLeft($code, $removedPlayerId, $totalPlayers);
+            } catch (\Exception $e) {
+            }
+        }
+
+        return new JsonResponse(['success' => true, 'removed' => count($removedPlayerIds)]);
     }
 
     #[Route('/board/{code}/enter-fullscreen', name: 'board_enter_fullscreen', methods: ['POST'])]
