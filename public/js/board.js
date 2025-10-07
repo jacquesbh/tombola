@@ -90,6 +90,11 @@ function handleRoundStarted(winnerId) {
 function showWinner(winnerId) {
     const playersGrid = document.getElementById('players-grid');
     const winnerCard = document.querySelector(`[data-player-id="${winnerId}"]`);
+    const buttonContainer = document.getElementById('button-container');
+    
+    if (buttonContainer) {
+        buttonContainer.style.display = 'none';
+    }
     
     if (winnerCard) {
         playersGrid.innerHTML = '';
@@ -106,6 +111,12 @@ function showWinner(winnerId) {
     setTimeout(() => {
         nextRoundBtn.classList.remove('hidden');
         nextRoundBtn.classList.add('next-round-corner');
+        
+        const qrSection = document.getElementById('qr-section');
+        if (qrSection) {
+            qrSection.style.display = 'block';
+            qrSection.classList.add('qr-after-winner');
+        }
     }, 5000);
 }
 
