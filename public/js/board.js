@@ -112,6 +112,8 @@ function showWinner(winnerId) {
         winnerCard.style.transform = 'scale(2.5)';
         
         createConfetti();
+        
+        notifyWinner(winnerId);
     }
 
     setTimeout(() => {
@@ -124,6 +126,20 @@ function showWinner(winnerId) {
             qrSection.classList.add('qr-after-winner');
         }
     }, 5000);
+}
+
+async function notifyWinner(winnerId) {
+    try {
+        await fetch(`/board/${code}/notify-winner`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ winnerId })
+        });
+    } catch (error) {
+        console.error('Error notifying winner:', error);
+    }
 }
 
 function createConfetti() {

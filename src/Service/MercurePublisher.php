@@ -39,6 +39,15 @@ class MercurePublisher
             'round' => $round,
         ]);
     }
+    
+    public function publishWinnerRevealed(string $code, string $winnerId, int $round): void
+    {
+        $this->publish("tombola/{$code}/players", [
+            'type' => 'winner_selected',
+            'winnerId' => $winnerId,
+            'round' => $round,
+        ]);
+    }
 
     public function publishNextRoundReady(string $code, int $round): void
     {

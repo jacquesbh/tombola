@@ -113,6 +113,26 @@ class BoardController extends AbstractController
         ]);
     }
 
+    #[Route('/board/{code}/notify-winner', name: 'board_notify_winner', methods: ['POST'])]
+    public function notifyWinner(string $code, Request $request): JsonResponse
+    {
+        if (!$this->tombolaManager->tombolaExists($code)) {
+            return new JsonResponse(['error' => 'Tombola not found'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $winnerId = $data['winnerId'] ?? null;
+        
+        if (!$winnerId) {
+            return new JsonResponse(['error' => 'Winner ID required'], 400);
+        }
+
+        $round = $this->tombolaManager->getRound($code);
+        $this->mercurePublisher->publishWinnerRevealed($code, $winnerId, $round);
+
+        return new JsonResponse(['success' => true]);
+    }
+
     #[Route('/board/{code}/next-round', name: 'board_next_round', methods: ['POST'])]
     public function nextRound(string $code): JsonResponse
     {
