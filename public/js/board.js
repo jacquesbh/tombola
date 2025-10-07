@@ -4,6 +4,8 @@ const nextRoundBtn = document.getElementById('next-round-btn');
 const playersGrid = document.getElementById('players-grid');
 const playerCount = document.getElementById('player-count');
 
+let isInRound = false;
+
 const mercureTopicUrl = `${mercureUrl}?topic=${encodeURIComponent(`tombola/${code}/board`)}&authorization=${encodeURIComponent(mercureToken)}`;
 console.log('Connecting to Mercure:', mercureTopicUrl);
 const eventSource = new EventSource(mercureTopicUrl);
@@ -39,6 +41,10 @@ eventSource.onerror = (error) => {
 
 function handlePlayerJoined(player, totalPlayers) {
     playerCount.textContent = totalPlayers;
+
+    if (isInRound) {
+        return;
+    }
 
     const existingCard = document.querySelector(`[data-player-id="${player.id}"]`);
     if (!existingCard) {
@@ -154,6 +160,8 @@ function shuffle(array) {
 }
 
 function enterFullscreen() {
+    isInRound = true;
+    
     const boardContainer = document.getElementById('board-container');
     const mainBoard = document.getElementById('main-board');
     const qrSection = document.getElementById('qr-section');
