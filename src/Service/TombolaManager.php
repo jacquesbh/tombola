@@ -51,7 +51,7 @@ class TombolaManager
         ];
 
         $players = $this->getPlayers($code);
-        $players[] = $player;
+        array_unshift($players, $player);
         
         $this->tombolaCache->delete("tombola.{$code}.players");
         $this->tombolaCache->get("tombola.{$code}.players", function (ItemInterface $item) use ($players) {

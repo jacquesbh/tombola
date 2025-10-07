@@ -57,7 +57,7 @@ function handlePlayerJoined(player, totalPlayers) {
             <p class="text-sm font-semibold text-gray-800">${player.firstName}</p>
             <p class="text-sm font-semibold text-gray-800">${player.lastName}</p>
         `;
-        playersGrid.appendChild(playerCard);
+        playersGrid.prepend(playerCard);
     }
 }
 
