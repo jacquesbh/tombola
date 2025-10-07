@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}En ligne - Tombola{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+        <div class="mb-8">
+            <div class="inline-block relative">
+                <img src="{{ player.gravatarUrl }}" 
+                     alt="{{ player.firstName }}" 
+                     class="w-32 h-32 rounded-full border-8 border-green-500 shadow-2xl mx-auto">
+                <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center animate-pulse">
+                    <span class="text-2xl">✓</span>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="text-4xl font-bold text-gray-800 mb-2">
+            {{ player.firstName }} {{ player.lastName }}
+        </h1>
+        
+        <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full font-bold text-lg mb-8">
+            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+            ONLINE
+        </div>
+
+        <div class="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-2xl p-6">
+            <p class="text-gray-700 text-lg">
+                Vous participez à la tombola !<br>
+                <span class="font-semibold">Bonne chance ! 🍀</span>
+            </p>
+        </div>
+
+        <p class="text-gray-500 text-sm mt-8">
+            Gardez cette page ouverte pendant la tombola
+        </p>
+    </div>
+</div>
+{% endblock %}

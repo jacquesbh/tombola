@@ -1,0 +1,8 @@
+framework:
+    cache:
+        app: cache.adapter.filesystem
+        
+        pools:
+            tombola.cache:
+                adapter: cache.adapter.filesystem
+                default_lifetime: 86400
