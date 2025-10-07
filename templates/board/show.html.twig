@@ -31,8 +31,13 @@
                 </div>
 
                 <div class="text-center mt-8">
+                    <button id="fullscreen-btn" 
+                            class="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-4 px-12 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200"
+                            data-code="{{ code }}">
+                        🖥️ Mettre en plein écran
+                    </button>
                     <button id="start-round-btn" 
-                            class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-12 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200"
+                            class="hidden bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-12 rounded-full text-2xl shadow-2xl transform hover:scale-105 transition-all duration-200"
                             data-code="{{ code }}">
                         🚀 Lancer le tour !
                     </button>

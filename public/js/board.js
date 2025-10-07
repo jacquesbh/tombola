@@ -1,3 +1,4 @@
+const fullscreenBtn = document.getElementById('fullscreen-btn');
 const startRoundBtn = document.getElementById('start-round-btn');
 const nextRoundBtn = document.getElementById('next-round-btn');
 const playersGrid = document.getElementById('players-grid');
@@ -55,10 +56,7 @@ function handlePlayerJoined(player, totalPlayers) {
 }
 
 function handleRoundStarted(winnerId) {
-    startRoundBtn.disabled = true;
-    startRoundBtn.classList.add('opacity-50', 'cursor-not-allowed');
-
-    enterFullscreen();
+    startRoundBtn.style.display = 'none';
 
     const allCards = Array.from(document.querySelectorAll('.player-card'));
     const loserCards = allCards.filter(card => card.getAttribute('data-player-id') !== winnerId);
@@ -154,7 +152,8 @@ function enterFullscreen() {
     
     qrSection.style.display = 'none';
     boardHeader.style.display = 'none';
-    startRoundBtn.style.display = 'none';
+    fullscreenBtn.style.display = 'none';
+    startRoundBtn.classList.remove('hidden');
     if (previousWinners) {
         previousWinners.style.display = 'none';
     }
@@ -192,6 +191,12 @@ function adjustCardSize(totalCards) {
     
     root.style.setProperty('--avatar-size', avatarSize);
     root.style.setProperty('--card-font-size', fontSize);
+}
+
+if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', () => {
+        enterFullscreen();
+    });
 }
 
 if (startRoundBtn) {
