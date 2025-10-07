@@ -9,10 +9,10 @@
         <p class="text-2xl text-purple-200">Code: <span class="font-mono font-bold">{{ code }}</span></p>
     </div>
 
-    <div class="flex-1 grid grid-cols-12 gap-6">
-        <div class="col-span-9">
+    <div class="flex-1 grid grid-cols-12 gap-6" id="board-container">
+        <div class="col-span-9" id="main-board">
             <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 h-full">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-6" id="board-header">
                     <h2 class="text-3xl font-bold text-white">Tour {{ round }}</h2>
                     <div class="text-2xl font-bold text-white">
                         <span id="player-count">{{ totalPlayers }}</span> joueur(s) connecté(s)
@@ -63,7 +63,7 @@
             {% endif %}
         </div>
 
-        <div class="col-span-3">
+        <div class="col-span-3" id="qr-section">
             <div class="bg-white rounded-2xl p-6 text-center shadow-2xl sticky top-8">
                 <h3 class="text-2xl font-bold text-gray-800 mb-4">📱 Scannez pour rejoindre</h3>
                 <img src="{{ qrCode }}" alt="QR Code" class="w-full max-w-xs mx-auto mb-4 rounded-lg shadow-lg">

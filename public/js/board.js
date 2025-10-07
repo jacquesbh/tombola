@@ -58,6 +58,8 @@ function handleRoundStarted(winnerId) {
     startRoundBtn.disabled = true;
     startRoundBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
+    enterFullscreen();
+
     const allCards = Array.from(document.querySelectorAll('.player-card'));
     const loserCards = allCards.filter(card => card.getAttribute('data-player-id') !== winnerId);
     
@@ -110,6 +112,26 @@ function shuffle(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+}
+
+function enterFullscreen() {
+    const boardContainer = document.getElementById('board-container');
+    const mainBoard = document.getElementById('main-board');
+    const qrSection = document.getElementById('qr-section');
+    const boardHeader = document.getElementById('board-header');
+    const playersGrid = document.getElementById('players-grid');
+    
+    qrSection.style.display = 'none';
+    boardHeader.style.display = 'none';
+    
+    mainBoard.classList.remove('col-span-9');
+    mainBoard.classList.add('col-span-12');
+    
+    boardContainer.classList.add('fullscreen-mode');
+    
+    const totalCards = document.querySelectorAll('.player-card').length;
+    const columns = Math.ceil(Math.sqrt(totalCards * 1.5));
+    playersGrid.style.gridTemplateColumns = `repeat(${columns}, minmax(0, 1fr))`;
 }
 
 if (startRoundBtn) {
