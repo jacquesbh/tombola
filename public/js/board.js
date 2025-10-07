@@ -168,6 +168,7 @@ function enterFullscreen() {
     const boardHeader = document.getElementById('board-header');
     const playersGrid = document.getElementById('players-grid');
     const previousWinners = document.getElementById('previous-winners');
+    const buttonContainer = document.getElementById('button-container');
     
     qrSection.style.display = 'none';
     boardHeader.style.display = 'none';
@@ -175,6 +176,13 @@ function enterFullscreen() {
     startRoundBtn.classList.remove('hidden');
     if (previousWinners) {
         previousWinners.style.display = 'none';
+    }
+    if (buttonContainer) {
+        buttonContainer.style.position = 'fixed';
+        buttonContainer.style.bottom = '50%';
+        buttonContainer.style.left = '50%';
+        buttonContainer.style.transform = 'translate(-50%, 50%)';
+        buttonContainer.style.zIndex = '10000';
     }
     
     mainBoard.classList.remove('col-span-9');
