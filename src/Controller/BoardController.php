@@ -41,7 +41,7 @@ class BoardController extends AbstractController
         $qrCode = $this->qrCodeService->generateQRCode($joinUrl);
 
         $removedPlayerIds = $this->tombolaManager->removeInactivePlayers($code, 6);
-        $totalPlayers = count($this->tombolaManager->getPlayers($code));
+        $totalPlayers = count($this->tombolaManager->getOnlinePlayers($code));
         
         foreach ($removedPlayerIds as $removedPlayerId) {
             try {
@@ -53,7 +53,7 @@ class BoardController extends AbstractController
         $state = $this->tombolaManager->getState($code);
         $players = ($state === 'in_round' || $state === 'showing_winner') 
             ? $this->tombolaManager->getActivePlayers($code)
-            : $this->tombolaManager->getPlayers($code);
+            : $this->tombolaManager->getOnlinePlayers($code);
         $winners = $this->tombolaManager->getWinners($code);
         $round = $this->tombolaManager->getRound($code);
 
@@ -91,7 +91,7 @@ class BoardController extends AbstractController
         }
 
         $removedPlayerIds = $this->tombolaManager->removeInactivePlayers($code, 6);
-        $totalPlayers = count($this->tombolaManager->getPlayers($code));
+        $totalPlayers = count($this->tombolaManager->getOnlinePlayers($code));
         
         foreach ($removedPlayerIds as $removedPlayerId) {
             try {

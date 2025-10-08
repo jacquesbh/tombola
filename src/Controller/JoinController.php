@@ -42,6 +42,7 @@ class JoinController extends AbstractController
         $firstName = $request->request->get('firstName');
         $lastName = $request->request->get('lastName');
         $email = $request->request->get('email');
+        $playerId = $request->request->get('playerId');
 
         if (empty($firstName) || empty($lastName) || empty($email)) {
             return $this->render('join/form.html.twig', [
@@ -57,8 +58,8 @@ class JoinController extends AbstractController
             ]);
         }
 
-        $player = $this->tombolaManager->addPlayer($code, $firstName, $lastName, $email);
-        $totalPlayers = count($this->tombolaManager->getPlayers($code));
+        $player = $this->tombolaManager->addPlayer($code, $firstName, $lastName, $email, $playerId);
+        $totalPlayers = count($this->tombolaManager->getOnlinePlayers($code));
 
         try {
             $this->mercurePublisher->publishPlayerJoined($code, $player, $totalPlayers);
@@ -89,7 +90,7 @@ class JoinController extends AbstractController
         }
 
         if (!$player) {
-            throw $this->createNotFoundException('Player not found');
+            return $this->redirectToRoute('join', ['code' => $code]);
         }
 
         $isActive = false;
@@ -122,6 +123,50 @@ class JoinController extends AbstractController
         ]);
     }
 
+    #[Route('/join/{code}/status/{playerId}', name: 'join_status', methods: ['GET'])]
+    public function status(string $code, string $playerId): Response
+    {
+        if (!$this->tombolaManager->tombolaExists($code)) {
+            return $this->json(['error' => 'Tombola not found'], 404);
+        }
+
+        $players = $this->tombolaManager->getPlayers($code);
+        $player = null;
+        
+        foreach ($players as $p) {
+            if ($p['id'] === $playerId) {
+                $player = $p;
+                break;
+            }
+        }
+
+        if (!$player) {
+            return $this->json(['removed' => true]);
+        }
+
+        $playerStatus = $player['status'] ?? 'online';
+        $activePlayers = $this->tombolaManager->getActivePlayers($code);
+        $state = $this->tombolaManager->getState($code);
+        
+        $isActive = false;
+        foreach ($activePlayers as $p) {
+            if ($p['id'] === $playerId) {
+                $isActive = true;
+                break;
+            }
+        }
+
+        $isPending = !$isActive && ($state === 'in_round' || $state === 'showing_winner') && $playerStatus === 'online';
+
+        return $this->json([
+            'removed' => false,
+            'isPending' => $isPending,
+            'isActive' => $isActive,
+            'isOffline' => $playerStatus === 'offline',
+            'state' => $state,
+        ]);
+    }
+
     #[Route('/join/{code}/heartbeat/{playerId}', name: 'join_heartbeat', methods: ['POST'])]
     public function heartbeat(string $code, string $playerId): Response
     {
@@ -138,7 +183,7 @@ class JoinController extends AbstractController
         $removedPlayerIds = $this->tombolaManager->removeInactivePlayers($code, 6);
         
         if (count($removedPlayerIds) > 0) {
-            $totalPlayers = count($this->tombolaManager->getPlayers($code));
+            $totalPlayers = count($this->tombolaManager->getOnlinePlayers($code));
             
             foreach ($removedPlayerIds as $removedPlayerId) {
                 try {

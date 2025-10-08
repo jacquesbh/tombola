@@ -17,7 +17,9 @@
             </div>
         {% endif %}
 
-        <form method="POST" action="{{ path('join_submit', {code: code}) }}" class="space-y-6">
+        <form method="POST" action="{{ path('join_submit', {code: code}) }}" class="space-y-6" id="join-form">
+            <input type="hidden" id="playerId" name="playerId" value="">
+            
             <div>
                 <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">
                     Prénom
@@ -62,4 +64,51 @@
         </form>
     </div>
 </div>
+
+<script>
+const code = '{{ code }}';
+
+const savedData = sessionStorage.getItem(`tombola_player_${code}`);
+if (savedData) {
+    try {
+        const player = JSON.parse(savedData);
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const emailInput = document.getElementById('email');
+        const playerIdInput = document.getElementById('playerId');
+        
+        firstNameInput.value = player.firstName || '';
+        lastNameInput.value = player.lastName || '';
+        emailInput.value = player.email || '';
+        playerIdInput.value = player.playerId || '';
+        
+        console.log('✨ Formulaire pré-rempli avec les données de session');
+        
+        if (player.firstName && player.lastName && player.email) {
+            console.log('🔄 Reconnexion automatique avec playerId:', player.playerId);
+            setTimeout(() => {
+                document.getElementById('join-form').submit();
+            }, 500);
+        }
+    } catch (e) {
+        console.error('Erreur lors du chargement des données sauvegardées:', e);
+    }
+}
+
+document.getElementById('join-form').addEventListener('submit', function(e) {
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const playerId = document.getElementById('playerId').value;
+    
+    sessionStorage.setItem(`tombola_player_${code}`, JSON.stringify({
+        playerId,
+        firstName,
+        lastName,
+        email
+    }));
+    
+    console.log('💾 Données sauvegardées dans sessionStorage');
+});
+</script>
 {% endblock %}

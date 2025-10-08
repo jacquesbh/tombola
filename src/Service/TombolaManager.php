@@ -37,9 +37,28 @@ class TombolaManager
         return $code;
     }
 
-    public function addPlayer(string $code, string $firstName, string $lastName, string $email): array
+    public function addPlayer(string $code, string $firstName, string $lastName, string $email, ?string $playerId = null): array
     {
-        $playerId = Uuid::v4()->toRfc4122();
+        $players = $this->getPlayers($code);
+        
+        if ($playerId) {
+            foreach ($players as &$player) {
+                if ($player['id'] === $playerId) {
+                    $player['lastHeartbeat'] = time();
+                    $player['status'] = 'online';
+                    
+                    $this->tombolaCache->delete("tombola.{$code}.players");
+                    $this->tombolaCache->get("tombola.{$code}.players", function (ItemInterface $item) use ($players) {
+                        $item->expiresAfter(86400);
+                        return json_encode($players);
+                    });
+                    
+                    return $player;
+                }
+            }
+        }
+        
+        $playerId = $playerId ?: Uuid::v4()->toRfc4122();
         
         $player = [
             'id' => $playerId,
@@ -49,9 +68,9 @@ class TombolaManager
             'gravatarUrl' => $this->gravatarService->getGravatarUrl($email),
             'joinedAt' => time(),
             'lastHeartbeat' => time(),
+            'status' => 'online',
         ];
 
-        $players = $this->getPlayers($code);
         array_unshift($players, $player);
         
         $this->tombolaCache->delete("tombola.{$code}.players");
@@ -71,6 +90,14 @@ class TombolaManager
         });
 
         return json_decode($data, true);
+    }
+
+    public function getOnlinePlayers(string $code): array
+    {
+        $players = $this->getPlayers($code);
+        return array_filter($players, function($player) {
+            return ($player['status'] ?? 'online') === 'online';
+        });
     }
 
     public function updatePlayerHeartbeat(string $code, string $playerId): bool
@@ -103,28 +130,26 @@ class TombolaManager
     {
         $players = $this->getPlayers($code);
         $currentTime = time();
-        $removedPlayers = [];
+        $offlinePlayers = [];
         
-        $activePlayers = array_filter($players, function($player) use ($currentTime, $timeoutSeconds, &$removedPlayers) {
+        foreach ($players as &$player) {
             $isActive = ($currentTime - ($player['lastHeartbeat'] ?? 0)) <= $timeoutSeconds;
-            if (!$isActive) {
-                $removedPlayers[] = $player['id'];
+            if (!$isActive && ($player['status'] ?? 'online') === 'online') {
+                $player['status'] = 'offline';
+                $offlinePlayers[] = $player['id'];
             }
-            return $isActive;
-        });
+        }
         
-        $activePlayers = array_values($activePlayers);
-        
-        if (count($removedPlayers) > 0) {
+        if (count($offlinePlayers) > 0) {
             $this->tombolaCache->delete("tombola.{$code}.players");
-            $this->tombolaCache->get("tombola.{$code}.players", function (ItemInterface $item) use ($activePlayers) {
+            $this->tombolaCache->get("tombola.{$code}.players", function (ItemInterface $item) use ($players) {
                 $item->expiresAfter(86400);
-                return json_encode($activePlayers);
+                return json_encode($players);
             });
             
             $frozenPlayers = $this->getActivePlayers($code);
-            $frozenPlayers = array_filter($frozenPlayers, function($player) use ($removedPlayers) {
-                return !in_array($player['id'], $removedPlayers);
+            $frozenPlayers = array_filter($frozenPlayers, function($player) use ($offlinePlayers) {
+                return !in_array($player['id'], $offlinePlayers);
             });
             $frozenPlayers = array_values($frozenPlayers);
             
@@ -135,7 +160,7 @@ class TombolaManager
             });
         }
         
-        return $removedPlayers;
+        return $offlinePlayers;
     }
 
     public function freezePlayers(string $code): void
