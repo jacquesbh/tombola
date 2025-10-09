@@ -16,4 +16,5 @@
 
 ###> symfony/asset-mapper ###
 /public/assets/
+# /assets/vendor/ - committed for deployment
 ###< symfony/asset-mapper ###
