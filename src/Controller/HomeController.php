@@ -19,9 +19,6 @@ class HomeController extends AbstractController
     {
         $code = $this->tombolaManager->createTombola();
         
-        dump('Created tombola: ' . $code);
-        dump('Exists check: ' . ($this->tombolaManager->tombolaExists($code) ? 'YES' : 'NO'));
-        
         return $this->redirectToRoute('board', ['code' => $code]);
     }
 }

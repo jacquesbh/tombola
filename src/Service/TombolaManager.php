@@ -27,13 +27,6 @@ class TombolaManager
         $this->setState($code, 'waiting');
         $this->setRound($code, 1);
         
-        // Verify it was saved
-        $check = $this->tombolaCache->get("tombola.{$code}.initialized", function (ItemInterface $item) {
-            $item->expiresAfter(1);
-            return null;
-        });
-        dump("After creation, tombola.{$code}.initialized = " . var_export($check, true));
-        
         return $code;
     }
 

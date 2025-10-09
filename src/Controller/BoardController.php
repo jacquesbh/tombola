@@ -30,9 +30,6 @@ class BoardController extends AbstractController
     #[Route('/board/{code}', name: 'board')]
     public function show(string $code): Response
     {
-        dump('Checking tombola: ' . $code);
-        dump('Exists: ' . ($this->tombolaManager->tombolaExists($code) ? 'YES' : 'NO'));
-        
         if (!$this->tombolaManager->tombolaExists($code)) {
             throw $this->createNotFoundException('Tombola not found');
         }
