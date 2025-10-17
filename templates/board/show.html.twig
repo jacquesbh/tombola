@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tombola - {{ code }}{% endblock %}
+{% block title %}{{ app_name }} - {{ code }}{% endblock %}
 
 {% block body %}
 <div class="container mx-auto px-4 py-8 h-screen flex flex-col">
     <div class="text-center mb-8">
-        <h1 class="text-6xl font-bold text-white mb-2">🎰 TOMBOLA</h1>
+        <h1 class="text-6xl font-bold text-white mb-2">{{ app_emoji }} {{ app_name }}</h1>
         <p class="text-2xl text-purple-200">Code: <span class="font-mono font-bold">{{ code }}</span></p>
     </div>
 

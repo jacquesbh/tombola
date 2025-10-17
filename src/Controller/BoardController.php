@@ -77,6 +77,8 @@ class BoardController extends AbstractController
             'totalPlayers' => count($players),
             'mercure_public_url' => $_ENV['MERCURE_PUBLIC_URL'] ?? 'http://localhost:3000/.well-known/mercure',
             'mercure_token' => $token,
+            'app_name' => $_ENV['APP_NAME'] ?? 'RAFFLE',
+            'app_emoji' => $_ENV['APP_EMOJI'] ?? '🎰',
         ]);
     }
 
