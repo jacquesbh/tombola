@@ -287,11 +287,11 @@ if (fullscreenBtn) {
                 enterFullscreen();
             } else {
                 const error = await response.json();
-                alert(error.error || 'Erreur lors du passage en plein écran');
+                alert(error.error || 'Error entering fullscreen');
             }
         } catch (error) {
             console.error('Error entering fullscreen:', error);
-            alert('Erreur lors du passage en plein écran');
+            alert('Error entering fullscreen');
         }
     });
 }
@@ -308,11 +308,11 @@ if (startRoundBtn) {
 
             if (!response.ok) {
                 const error = await response.json();
-                alert(error.error || 'Erreur lors du démarrage du tour');
+                alert(error.error || 'Error starting round');
             }
         } catch (error) {
             console.error('Error starting round:', error);
-            alert('Erreur lors du démarrage du tour');
+            alert('Error starting round');
         }
     });
 }
@@ -329,11 +329,11 @@ if (nextRoundBtn) {
 
             if (!response.ok) {
                 const error = await response.json();
-                alert(error.error || 'Erreur lors du passage au tour suivant');
+                alert(error.error || 'Error going to next round');
             }
         } catch (error) {
             console.error('Error going to next round:', error);
-            alert('Erreur lors du passage au tour suivant');
+            alert('Error going to next round');
         }
     });
 }
