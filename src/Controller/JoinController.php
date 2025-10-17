@@ -29,6 +29,7 @@ class JoinController extends AbstractController
 
         return $this->render('join/form.html.twig', [
             'code' => $code,
+            'app_emoji_join' => $_ENV['APP_EMOJI_JOIN'] ?? '🎯',
         ]);
     }
 
