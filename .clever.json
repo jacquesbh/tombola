@@ -1,10 +1,10 @@
 {
   "apps": [
     {
-      "app_id": "app_35513a66-ceac-490a-bdfb-48853b1eeba6",
-      "org_id": "user_d658f30b-96a8-45b3-bcfd-720f246516e7",
-      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_35513a66-ceac-490a-bdfb-48853b1eeba6.git",
-      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_35513a66-ceac-490a-bdfb-48853b1eeba6.git",
+      "app_id": "app_97f9b0db-3fb3-4f10-b6cf-1e009855b5f7",
+      "org_id": "orga_3a5e7212-5c23-4026-8d9a-c2cb8000b008",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_97f9b0db-3fb3-4f10-b6cf-1e009855b5f7.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_97f9b0db-3fb3-4f10-b6cf-1e009855b5f7.git",
       "name": "tombola-ai",
       "alias": "tombola-ai"
     }
