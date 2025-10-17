@@ -53,9 +53,11 @@
         </div>
         {% endif %}
 
-        <p class="text-gray-500 text-sm mt-8" data-i18n="status.keepOpen">
-            Keep this page open during the raffle
-        </p>
+        <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mt-8">
+            <p class="text-yellow-800 text-sm font-semibold" data-i18n="status.keepOpen">
+                ⚠️ Keep this page open and active during the raffle or you will be disconnected!
+            </p>
+        </div>
         
         <button id="quit-btn" 
                 class="mt-6 text-gray-400 hover:text-gray-600 text-sm transition-colors"
@@ -86,7 +88,7 @@ const translations = {
         'status.pendingMessage2': 'Stay connected!',
         'status.winnerMessage': 'CONGRATULATIONS!',
         'status.winnerMessage2': 'YOU WON!',
-        'status.keepOpen': 'Keep this page open during the raffle',
+        'status.keepOpen': '⚠️ Keep this page open and active during the raffle or you will be disconnected!',
         'status.quit': '↩️ Leave the raffle',
         'status.reconnect': '🔄 Reconnect',
         'alert.quit': 'Do you really want to leave the raffle?',
@@ -108,7 +110,7 @@ const translations = {
         'status.pendingMessage2': 'Restez connecté !',
         'status.winnerMessage': 'FÉLICITATIONS !',
         'status.winnerMessage2': 'VOUS AVEZ GAGNÉ !',
-        'status.keepOpen': 'Gardez cette page ouverte pendant la tombola',
+        'status.keepOpen': '⚠️ Gardez cette page ouverte et active pendant la tombola ou vous serez déconnecté !',
         'status.quit': '↩️ Quitter la tombola',
         'status.reconnect': '🔄 Se reconnecter',
         'alert.quit': 'Voulez-vous vraiment quitter la tombola ?',

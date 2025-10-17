@@ -16,6 +16,7 @@
             <h1 class="text-5xl mb-4">{{ app_emoji_join }}</h1>
             <h2 class="text-3xl font-bold text-gray-800 mb-2" data-i18n="form.title">Join the Raffle</h2>
             <p class="text-gray-600" data-i18n="form.subtitle">Fill in your information to participate</p>
+            <p class="text-sm text-gray-500 mt-2" data-i18n="form.privacy">We don't record any data.</p>
         </div>
 
         {% if error is defined %}
@@ -83,6 +84,7 @@ const translations = {
     en: {
         'form.title': 'Join the Raffle',
         'form.subtitle': 'Fill in your information to participate',
+        'form.privacy': '🔒 Your data is only used during the event and not stored.',
         'form.firstName': 'First Name',
         'form.firstNamePlaceholder': 'Your first name',
         'form.lastName': 'Last Name',
@@ -95,6 +97,7 @@ const translations = {
     fr: {
         'form.title': 'Rejoindre la Tombola',
         'form.subtitle': 'Remplissez vos informations pour participer',
+        'form.privacy': '🔒 Vos données sont utilisées uniquement pendant l\'événement et ne sont pas conservées.',
         'form.firstName': 'Prénom',
         'form.firstNamePlaceholder': 'Votre prénom',
         'form.lastName': 'Nom',
